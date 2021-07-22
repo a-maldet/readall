@@ -1,0 +1,514 @@
+---
+title: "readall"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{readall}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+#library(readall)
+```
+
+The package `readall` offers a single interface in order to read
+various types of data files. The following data file types are supported:
+
+- **FWF** (which stands for **Fixed Width Files**): The data is stored
+  in a text file (**ANSI** or **UTF-8**) and each data column has a fixed
+  width (fixed number of bytes).
+- **DSV** (wich stands for **Delimiter Separated Values**): The data is stored
+  in a text file (**ANSI** or **UTF-8**) and the data columns are
+  separated by a delimiter symbole (usually `","` or `";"`).
+- **EXCEL**: Excel files (`*.xlsx` or `*.xlsm`)
+- **SAS**: SAS data files (`*.sas7bdat` or `*.sas7bcat`)
+
+## Installation
+
+```{r eval = FALSE}
+devtools::install_github('a-maldet/readall', build_vignettes = TRUE)
+```
+
+## Usage
+
+### About `file_structure` class objects
+
+In order to read data files, which are not stored as an R data file, we often
+have to supply additional information about the file structure to the 
+reading operation (column names, column types, delimiter symbols etc.).
+Often multiple files share the same structure. Therefore, the `readall`
+package offers the `file_structure` class, which can be
+used in order to store all information about the structure of a
+data file in a single `file_structure` class object.
+This can be done by using one of the following functions:
+
+- `new_file_structure_fwf()`: Define the file structure of an FWF data file
+- `new_file_structure_dsv()`: Define the file structure of a DSV data file
+- `new_file_structure_excel()`: Define the file structure of an EXCEL data file 
+- `new_file_structure_sas()`: Define the file structure of a SAS data file
+
+The created `file_structure` class object can be used in order to read
+all data files which share the defined structure.
+
+
+### About `file_definition` class objects
+
+In the section before, we defined `file_structure` class objects, which 
+hold the file structure information. This type of information
+can be valid for several data files. But there are also informations,
+which are only valid for a single data file. For example the file path to
+the data file.
+Therefore, the `readall` package offers a `file_definition` class, which
+extends the `file_structure` class. This means that
+a `file_definition` class object contains all needed information about the
+file structure information and additionally some information that is
+only valid for a specific file (like the file path).
+A `file_definition` class object holds all information, which is neccessary
+in order to read a specific data file with the function `read_data()`.
+The following functions can be used in order to create a `file_definition`
+class object:
+
+- `new_file_definition()`: With this function you can use an existing
+  `file_structure` class object in order to create a `file_definition` class
+  object, by appending all needed file specific information to the
+  given `file_structure` object.
+  Depending on the file type defined in the given `file_structure` class object
+  the resulting `file_definition` class object can describe FWF, DSV, EXCEL
+  or SAS data files.
+- `new_file_definition_fwf()`: Create a `file_definition` class object for FWF data files
+- `new_file_definition_dsv()`: Create a `file_definition` class object for DSV data files
+- `new_file_definition_excel()`: Create a `file_definition` class object for EXCEL data files
+- `new_file_definition_sas()`: Create a `file_definition` class object for SAS data files
+
+### About `file_collection` class objects
+
+Sometimes, it is neccessary not only to read a single data file, but to read a
+collection of data files and concatenate all data sets into a
+single data frame. Sometimes, the data files in such a file collection
+can contain data files of different file structure or even file types (for example
+a mix of SAS, EXCEL, FWF and DSV data files).
+For this case, the `readall` package offers a `file_collection` class. 
+In a `file_collection` class object, you can store multiple `file_definition`
+class objects, which define the needed data files. When calling the function
+`read_data()`, all defined data files will be read an automatically 
+concatenated into a single data.frame.
+The function `new_file_collection()` is used in order to create such 
+`file_collection` class objects.
+
+### About adapter functions
+
+When reading a collection of data files,
+it is often neccessary to post process the each data.frame,
+before concatenating all data.frames.
+E.g. recode some variable levels, calculate new columns or rename
+existing columns.
+For this reason, the `readall` package offers adapter functions, which
+are functions of the typ `f: DATA.FRAME -> DATA.FRAME`. This means,
+that an adapter function takes a `data.frame` and returns a mutated version
+of the `data.frame`.
+An example of an adapter function would be the following function:
+
+```{r eval = FALSE}
+g <- function(x) {
+  x[x$a > 1,]
+}
+```
+
+Usually, on does not only want to perform a single data transformation, but
+an entire list of data transformations. For this reason the `readall` package
+offers the function `new_adapters()`, which can be used to store multiple
+adapter funcitons in a single `adapters` class object. An `adapters` 
+class object is a list of adapter functions, which can be stored in a
+`file_structure` or a `file_definition` class object.
+For example:
+
+```{r eval = FALSE}
+structure_excel_1 <- new_file_structure_excel(
+  col_names = c("city", "adult"),
+  col_types = c("character", "logical"),
+  adapters = new_adapters(
+    function(x) {
+      names(x) <- c("CITY", "ADULT")
+      x
+    },
+    function(x) {
+      x <- x[!is.na(x$CITY),]
+      x$CITY <- trimws(x$CITY)
+      x
+    }
+  )
+)
+```
+
+When calling `read_data()` the data will be read from the EXCEL file and
+then the columns will automatically be renamed to `CITY` and `ADULT` and 
+all rows with missing values for `CITY` will be removed. Furthermore,
+the strings in `CITY` will stripped of all leading and trailing white spaces.
+
+### About meta data
+
+The package `readall` allows you to add meta data to `file_structure`
+and `file_definition` class objects. This meta data can contain a detailed
+description of each column and its value leves.
+The meta data of a single data column is stored in a `col_meta` class object,
+which can be created with the command `new_col_meta()`.
+The meta information for all columns can be collected with the command
+`new_file_meta()`.
+
+Example-1:
+```{r eval = FALSE}
+structure_excel_1 <- new_file_structure_excel(
+  col_names = c("city", "adult"),
+  col_types = c("character", "logical"),
+  meta_list = new_file_meta(
+    new_col_meta(
+      desc = "National and international city codes",
+      values = c("XXXX", "A", NA),
+      values_desc = c("4 digit city code", "abroad", "missing")
+    ),
+    new_col_meta(
+      desc = "Is the person an adult",
+      values = c(TRUE, FALSE, NA),
+      values_desc = c("The person is an adult", "The person is a child", "unknown")
+    )
+  )
+)
+```
+
+Example-2:
+```{r eval = FALSE}
+structure_excel_1 <- new_file_structure_excel(
+  cols = list(
+    list(
+      name = "city",
+      type = "character",
+      new_col_meta(
+        desc = "National and international city codes",
+        values = c("XXXX", "A", NA),
+        values_desc = c("4 digit city code", "abroad", "missing")
+      )
+    ),
+    list(
+      name = "adult",
+      type = "logical",
+      new_col_meta(
+        desc = "Is the person an adult",
+        values = c(TRUE, FALSE, NA),
+        values_desc = c("The person is an adult", "The person is a child", "unknown")
+      )
+    )
+  )
+)
+```
+
+If a data file is read with the command `read_data()`, then all
+specified meta informations will be added to specific columns of the resulting
+`data.frame`.
+
+The meta data stored in a `file_structure` or a `file_definition` class object
+or a `data.frame` generated by calling `read_data()` can be extracted by
+calling `get_meta()`.
+
+Example-3:
+```{r eval = FALSE}
+df_meta <- get_meta(file_definition_1, cols = c("city", "adult"))
+```
+
+Example-4:
+```{r eval = FALSE}
+data <- read_data(file_definition_1)
+df_meta <- get_meta(data, cols = c("city", "adult"))
+```
+
+### Important commands
+
+The following section describes the most important function of `readall`.
+Each function is documented and the documentation of each function can be
+displayed by calling `?readall::FUNCTIONNAME`.
+
+#### Create `file_structure` class objects
+
+`file_structure` class objects contain all information about the file
+structure, which can be valid for several data files (e.g. column structure,
+delimiter symbols, column names, data types etc.). This class objects
+can be created with the following commands:
+
+- `new_file_structure_fwf()`: File structure of FWF data files
+- `new_file_structure_dsv()`: File structure of DSV files
+- `new_file_structure_excel()`: File structure of EXCEL files
+- `new_file_structure_sas()`: File structure of SAS files
+
+Example:
+
+```{r eval = FALSE}
+structure_fwf_1 <- new_file_structure_fwf(
+  cols = list(
+    list(
+      type = "character",
+      name = "sex",
+      start = 1
+    ),
+    list(
+      type = "numeric",
+      name = "age",
+      start = 3
+    ),
+    list(
+      typ = "numeric",
+      name = "city",
+      start = 7
+      
+    )
+  ),
+  sep_width = 1,
+  adapters = new_adapters(
+    function(x) {
+      x$sex <- ifelse(x$sex == "m", "male", "female")
+      x
+    }
+  )
+)
+```
+
+The code above creates a `file_structure` class object for FWF data files.
+This data files contain three column (sex, age and city codes).
+The `sex` column starts with the first row character and contains a single
+character. After that, there is a blank space (`sep_width = 1`) and then
+cames the `age` column consisting out of three characters. After that
+is again a blank space and finally comes the `city` column holding the
+city codes. The created `file_structure` class object contains an
+adapter function, which will automatically be executed after reading a
+data file with this `file_structure` object. The adapter function
+recodes the `sex` column to full length strings.
+
+#### Create `file_definition` class objects
+
+A `file_definition` class object contains all information can also be
+stored in `file_structure` class objects (information about the file structure
+which can be valid for all files of the same structure),
+but it also contains information that is only valid for a single specific
+data file. `file_definition` class objects can be created with the following
+command:
+
+- `new_file_definition()`: Takes an existing `file_structure` class objects and
+  extends it to a `file_definition` class object.
+  Depending on the `file_structure` class object the resulting `file_definition`
+  class object can be describe FWF, DSV, EXCEL and SAS data files.
+- `new_file_definition_fwf()`: Creates a `file_definition` class object for FWF data files
+- `new_file_definition_dsv()`: Creates a `file_definition` class object for DSV data files
+- `new_file_definition_excel()`: Creates a `file_definition` class object for EXCEL data files
+- `new_file_definition_sas()`: Creates a `file_definition` class object for SAS data files
+
+Example:
+
+```{r eval = FALSE}
+file_definition_file_1 <- new_file_definition(
+  file_path = "C:/file1.dat",
+  file_structure = structure_fwf_1,
+  extra_adapters = new_adapters(
+    function(x) {
+      x[x$age >= 30 && x$age < 40,]
+    }
+  )
+)
+```
+
+The created `file_definition` class object `file_definition_file_1`
+extends the `file_structure` class object `structure_fwf_1`, which was defined
+earlier.
+Therefore, it is a `file_definition` for an FWF data file, which is 
+located at `C:/file1.dat`. After reading this data file, the read data set is
+automatically filtered by age, such that only persons with age between 30 and
+40 are kept.
+
+#### Create `file_collection` class objects
+
+A `file_collection` class object contains a list of `file_definition`
+class objects, describing different data files, whose data should
+automatically be concatenated after reading the data files.
+A `file_collection` class object can be created with the command
+`new_file_collection()`.
+
+Example:
+
+```{r eval = FALSE}
+file_collection_1 <- new_file_collection(
+  file_definition_file_1,
+  file_definition_file_2,
+  file_definition_file_3,
+  cols_keep = c("sex", "age"),
+  extra_adapters = new_adapters(
+    function(x) {
+      x[x$sex == "male",]
+    }
+  )
+  extra_col_file_path = "file"
+)
+```
+
+The `file_collection` class object in this example contains the 
+informations of 3 different data files. If `read_data()` is applied on
+`file_collection_1`, then the following steps are executed automatically:
+
+1. All 3 data files are read and each data set is stored in a `data.frame`
+2. For each `data.frame` only the columns `sex` and `age` are kept
+3. The column `file` is added to each `data.frame`, holding the file path of each data file
+4. The adapter functions are executed on each `data.frame`.
+   For the data file defined in `file_definition_1`, three adapter functions
+   were defined. First, the column `sex` is recoded, then the `data.frame` is
+   filtered by `age` and finally only entries with `sex == "male"` are kept.
+   For the data files defined in `file_definition_2` and `file_definition_3`
+   we don't know if there were adapter functions defined before 
+   (when the `file_definition` class objects were defined), but 
+   for both data files there is at least one adapter function defined, which
+   filters `sex == "male"`.
+5. All three `data.frames` are concatenated into a single `data.frame`
+
+The resulting `data.frame` could look something like this
+
+```{r eval = TRUE, echo = FALSE}
+data.frame(
+  sex = rep("male", 7),
+  age = c(16, 67, 31, 84, 47, 33, 98),
+  file = c("R:/daten/file1.dat", "R:/daten/file1.dat", "R:/daten/file2.sas", "R:/daten/file2.sas", "R:/daten/file3.excel", "R:/daten/file3.excel", "R:/daten/file3.excel")
+)
+```
+
+#### Reading single data files
+
+The following functions can be used, in order to read data files:
+
+- `read_data()`: Read the FWF, DSV, EXCEL or SAS data file, which was defined
+  in the passed in `file_definition` class object.
+- `read_data_fwf()`: Read an FWF data file. Instead of passing in a
+  `file_definition` class object holding all needed informations,
+  the needed file definitions are passed directy to the function. 
+- `read_data_dsv()`: Read a DSV data file. Instead of passing in a
+  `file_definition` class object holding all needed informations,
+  the needed file definitions are passed directy to the function. 
+- `read_data_excel()`: Read an EXCEL data file. Instead of passing in a
+  `file_definition` class object holding all needed informations,
+  the needed file definitions are passed directy to the function. 
+- `read_data_sas()`: Read a SAS data file. Instead of passing in a
+  `file_definition` class object holding all needed informations,
+  the needed file definitions are passed directy to the function. 
+
+Example-1:
+
+```{r eval = FALSE}
+df1 <- read_data(file_definition_file_1)
+```
+
+Example-2:
+
+```{r eval = FALSE}
+df2 <- read_data_fwf(
+  file_path = "R:/daten/file1.dat",
+  cols = list(
+    list(
+      type = "character",
+      name = "sex",
+      start = 1
+    ),
+    list(
+      type = "numeric",
+      name = "age",
+      start = 3
+    ),
+    list(
+      typ = "numeric",
+      name = "city",
+      start = 7
+      
+    )
+  ),
+  sep_width = 1,
+  adapters = new_adapters(
+    function(x) {
+      x$sex <- ifelse(x$sex == "m", "male", "female")
+      x
+    },
+    function(x) {
+      x[x$city >= 70000 && x$city < 80000,]
+    }
+  ),
+  cols_keep = c("sex", "age"),
+  extra_col_file_path = "file"
+)
+```
+
+#### Read multiple data files at once
+
+The function `read_data()` does not only take `file_definition` class objects,
+but also `file_collection` class objects. By using `file_collection` class
+objects, we can also read multiple data files at once.
+
+Example:
+
+```{r eval = FALSE}
+df_gesamt <- read_data(file_collection_1)
+```
+
+The command above reads all 3 data files defined in `file_collection_1`.
+The following steps are executed automatically:
+
+1. All 3 data files are read and each data set is stored in a `data.frame`
+2. For each `data.frame` only the columns `sex` and `age` are kept
+3. The column `file` is added to each `data.frame`, holding the file path of each data file
+4. The adapter functions are executed on each `data.frame`.
+   For the data file defined in `file_definition_1`, three adapter functions
+   were defined. First, the column `sex` is recoded, then the `data.frame` is
+   filtered by `age` and finally only entries with `sex == "male"` are kept.
+   For the data files defined in `file_definition_2` and `file_definition_3`
+   we don't know if there were adapter functions defined before 
+   (when the `file_definition` class objects were defined), but 
+   for both data files there is at least one adapter function defined, which
+   filters `sex == "male"`.
+5. All three `data.frames` are concatenated into a single `data.frame`
+
+#### Read meta data
+
+The function `get_meta()` can extract meta data from:
+
+- `file_structure` class objects
+- `file_definition` class objects
+- `file_collection` class objects
+- `data.frames` created by calling `read_data()` or `read_data_*()` 
+  (where `*` can stands for fwf/dsv/excel/sas)
+
+The command `get_meta()` returns a `data.frame` holding the following columns:
+
+- `col_name`: A charcter column, holding the names for each data column
+- `col_id`: A numeric column, holding the positions of each data column
+- `col_type`: A character column, holding data type of each data column
+- `col_desc`: A character column, describing each column in detail
+- `col_values`: A character column, holding a text version the value levels of each column
+- `col_values_desc`: A character column, describing each value level of each column
+- `col_valid_start`: A character column, giving some information since when
+  the variable is valid
+- `col_valid_end`: A character column, giving some information till when
+  the variable is valid
+- `file_path`: A character column, holding the file paths of the data files.
+
+#### Change existing `file_definition` or `file_collection` objects
+
+Sometimes it is useful to modify some attributes of a `file_definition` or a 
+`file_collection`. The following commands can be useful:
+
+- `set_cols_keep()`: Set the columns which should be kept when calling `read_data()`
+- `set_extra_col_file_path()`: Set the name of the column, in which
+  the file path of the data files should be stored.
+- `set_n_max()`: Set the maximum number of rows to be read when calling
+  `read_data()`. If applied to a `file_collection` this value is set for 
+  each `file_definition` contained in the collection.
+- `set_adapters()`: Set the adapters attribute. This argument overwrites all
+  existing adapter functions. If applied to a `file_collection`, this
+  command is applied to each `file_definition` contained in the collection.
+- `add_adapters()`: Append a set of adapter functions to the already defined
+  adapter functions. If applied to a `file_collection`, the adapter functions
+  are appended to each `file_definition` contained in the collection.
+

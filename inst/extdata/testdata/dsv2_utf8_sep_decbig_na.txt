@@ -1,0 +1,4 @@
+1.000,1 |  ä1| TRUE  | skip  | 1.000,0
+ na     | na |FALSE  |  skip |-2
+ -3     |ä3  |     na|  skip | na
+ na     | na |FALSE  |  skip |na

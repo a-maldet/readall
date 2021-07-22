@@ -1,0 +1,3 @@
+ 1,000.1     ä1  TRUE   skip   1,000
+2.2                    skip   
+-3       ä3     FALSE   skip   -3

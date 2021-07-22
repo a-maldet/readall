@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>readall</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">readall</h1>
+
+
+
+<p>The package <code>readall</code> offers a single interface in order to read various types of data files. The following data file types are supported:</p>
+<ul>
+<li><strong>FWF</strong> (which stands for <strong>Fixed Width Files</strong>): The data is stored in a text file (<strong>ANSI</strong> or <strong>UTF-8</strong>) and each data column has a fixed width (fixed number of bytes).</li>
+<li><strong>DSV</strong> (wich stands for <strong>Delimiter Separated Values</strong>): The data is stored in a text file (<strong>ANSI</strong> or <strong>UTF-8</strong>) and the data columns are separated by a delimiter symbole (usually <code>&quot;,&quot;</code> or <code>&quot;;&quot;</code>).</li>
+<li><strong>EXCEL</strong>: Excel files (<code>*.xlsx</code> or <code>*.xlsm</code>)</li>
+<li><strong>SAS</strong>: SAS data files (<code>*.sas7bdat</code> or <code>*.sas7bcat</code>)</li>
+</ul>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&#39;a-maldet/readall&#39;</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+</div>
+<div id="usage" class="section level2">
+<h2>Usage</h2>
+<div id="about-file_structure-class-objects" class="section level3">
+<h3>About <code>file_structure</code> class objects</h3>
+<p>In order to read data files, which are not stored as an R data file, we often have to supply additional information about the file structure to the reading operation (column names, column types, delimiter symbols etc.). Often multiple files share the same structure. Therefore, the <code>readall</code> package offers the <code>file_structure</code> class, which can be used in order to store all information about the structure of a data file in a single <code>file_structure</code> class object. This can be done by using one of the following functions:</p>
+<ul>
+<li><code>new_file_structure_fwf()</code>: Define the file structure of an FWF data file</li>
+<li><code>new_file_structure_dsv()</code>: Define the file structure of a DSV data file</li>
+<li><code>new_file_structure_excel()</code>: Define the file structure of an EXCEL data file</li>
+<li><code>new_file_structure_sas()</code>: Define the file structure of a SAS data file</li>
+</ul>
+<p>The created <code>file_structure</code> class object can be used in order to read all data files which share the defined structure.</p>
+</div>
+<div id="about-file_definition-class-objects" class="section level3">
+<h3>About <code>file_definition</code> class objects</h3>
+<p>In the section before, we defined <code>file_structure</code> class objects, which hold the file structure information. This type of information can be valid for several data files. But there are also informations, which are only valid for a single data file. For example the file path to the data file. Therefore, the <code>readall</code> package offers a <code>file_definition</code> class, which extends the <code>file_structure</code> class. This means that a <code>file_definition</code> class object contains all needed information about the file structure information and additionally some information that is only valid for a specific file (like the file path). A <code>file_definition</code> class object holds all information, which is neccessary in order to read a specific data file with the function <code>read_data()</code>. The following functions can be used in order to create a <code>file_definition</code> class object:</p>
+<ul>
+<li><code>new_file_definition()</code>: With this function you can use an existing <code>file_structure</code> class object in order to create a <code>file_definition</code> class object, by appending all needed file specific information to the given <code>file_structure</code> object. Depending on the file type defined in the given <code>file_structure</code> class object the resulting <code>file_definition</code> class object can describe FWF, DSV, EXCEL or SAS data files.</li>
+<li><code>new_file_definition_fwf()</code>: Create a <code>file_definition</code> class object for FWF data files</li>
+<li><code>new_file_definition_dsv()</code>: Create a <code>file_definition</code> class object for DSV data files</li>
+<li><code>new_file_definition_excel()</code>: Create a <code>file_definition</code> class object for EXCEL data files</li>
+<li><code>new_file_definition_sas()</code>: Create a <code>file_definition</code> class object for SAS data files</li>
+</ul>
+</div>
+<div id="about-file_collection-class-objects" class="section level3">
+<h3>About <code>file_collection</code> class objects</h3>
+<p>Sometimes, it is neccessary not only to read a single data file, but to read a collection of data files and concatenate all data sets into a single data frame. Sometimes, the data files in such a file collection can contain data files of different file structure or even file types (for example a mix of SAS, EXCEL, FWF and DSV data files). For this case, the <code>readall</code> package offers a <code>file_collection</code> class. In a <code>file_collection</code> class object, you can store multiple <code>file_definition</code> class objects, which define the needed data files. When calling the function <code>read_data()</code>, all defined data files will be read an automatically concatenated into a single data.frame. The function <code>new_file_collection()</code> is used in order to create such <code>file_collection</code> class objects.</p>
+</div>
+<div id="about-adapter-functions" class="section level3">
+<h3>About adapter functions</h3>
+<p>When reading a collection of data files, it is often neccessary to post process the each data.frame, before concatenating all data.frames. E.g. recode some variable levels, calculate new columns or rename existing columns. For this reason, the <code>readall</code> package offers adapter functions, which are functions of the typ <code>f: DATA.FRAME -&gt; DATA.FRAME</code>. This means, that an adapter function takes a <code>data.frame</code> and returns a mutated version of the <code>data.frame</code>. An example of an adapter function would be the following function:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>g &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</span>
+<span id="cb2-2"><a href="#cb2-2"></a>  x[x<span class="op">$</span>a <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>,]</span>
+<span id="cb2-3"><a href="#cb2-3"></a>}</span></code></pre></div>
+<p>Usually, on does not only want to perform a single data transformation, but an entire list of data transformations. For this reason the <code>readall</code> package offers the function <code>new_adapters()</code>, which can be used to store multiple adapter funcitons in a single <code>adapters</code> class object. An <code>adapters</code> class object is a list of adapter functions, which can be stored in a <code>file_structure</code> or a <code>file_definition</code> class object. For example:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>structure_excel_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">new_file_structure_excel</span>(</span>
+<span id="cb3-2"><a href="#cb3-2"></a>  <span class="dt">col_names =</span> <span class="kw">c</span>(<span class="st">&quot;city&quot;</span>, <span class="st">&quot;adult&quot;</span>),</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="dt">col_types =</span> <span class="kw">c</span>(<span class="st">&quot;character&quot;</span>, <span class="st">&quot;logical&quot;</span>),</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="dt">adapters =</span> <span class="kw">new_adapters</span>(</span>
+<span id="cb3-5"><a href="#cb3-5"></a>    <span class="cf">function</span>(x) {</span>
+<span id="cb3-6"><a href="#cb3-6"></a>      <span class="kw">names</span>(x) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;CITY&quot;</span>, <span class="st">&quot;ADULT&quot;</span>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a>      x</span>
+<span id="cb3-8"><a href="#cb3-8"></a>    },</span>
+<span id="cb3-9"><a href="#cb3-9"></a>    <span class="cf">function</span>(x) {</span>
+<span id="cb3-10"><a href="#cb3-10"></a>      x &lt;-<span class="st"> </span>x[<span class="op">!</span><span class="kw">is.na</span>(x<span class="op">$</span>CITY),]</span>
+<span id="cb3-11"><a href="#cb3-11"></a>      x<span class="op">$</span>CITY &lt;-<span class="st"> </span><span class="kw">trimws</span>(x<span class="op">$</span>CITY)</span>
+<span id="cb3-12"><a href="#cb3-12"></a>      x</span>
+<span id="cb3-13"><a href="#cb3-13"></a>    }</span>
+<span id="cb3-14"><a href="#cb3-14"></a>  )</span>
+<span id="cb3-15"><a href="#cb3-15"></a>)</span></code></pre></div>
+<p>When calling <code>read_data()</code> the data will be read from the EXCEL file and then the columns will automatically be renamed to <code>CITY</code> and <code>ADULT</code> and all rows with missing values for <code>CITY</code> will be removed. Furthermore, the strings in <code>CITY</code> will stripped of all leading and trailing white spaces.</p>
+</div>
+<div id="about-meta-data" class="section level3">
+<h3>About meta data</h3>
+<p>The package <code>readall</code> allows you to add meta data to <code>file_structure</code> and <code>file_definition</code> class objects. This meta data can contain a detailed description of each column and its value leves. The meta data of a single data column is stored in a <code>col_meta</code> class object, which can be created with the command <code>new_col_meta()</code>. The meta information for all columns can be collected with the command <code>new_file_meta()</code>.</p>
+<p>Example-1:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>structure_excel_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">new_file_structure_excel</span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="dt">col_names =</span> <span class="kw">c</span>(<span class="st">&quot;city&quot;</span>, <span class="st">&quot;adult&quot;</span>),</span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="dt">col_types =</span> <span class="kw">c</span>(<span class="st">&quot;character&quot;</span>, <span class="st">&quot;logical&quot;</span>),</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="dt">meta_list =</span> <span class="kw">new_file_meta</span>(</span>
+<span id="cb4-5"><a href="#cb4-5"></a>    <span class="kw">new_col_meta</span>(</span>
+<span id="cb4-6"><a href="#cb4-6"></a>      <span class="dt">desc =</span> <span class="st">&quot;National and international city codes&quot;</span>,</span>
+<span id="cb4-7"><a href="#cb4-7"></a>      <span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;XXXX&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="ot">NA</span>),</span>
+<span id="cb4-8"><a href="#cb4-8"></a>      <span class="dt">values_desc =</span> <span class="kw">c</span>(<span class="st">&quot;4 digit city code&quot;</span>, <span class="st">&quot;abroad&quot;</span>, <span class="st">&quot;missing&quot;</span>)</span>
+<span id="cb4-9"><a href="#cb4-9"></a>    ),</span>
+<span id="cb4-10"><a href="#cb4-10"></a>    <span class="kw">new_col_meta</span>(</span>
+<span id="cb4-11"><a href="#cb4-11"></a>      <span class="dt">desc =</span> <span class="st">&quot;Is the person an adult&quot;</span>,</span>
+<span id="cb4-12"><a href="#cb4-12"></a>      <span class="dt">values =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">NA</span>),</span>
+<span id="cb4-13"><a href="#cb4-13"></a>      <span class="dt">values_desc =</span> <span class="kw">c</span>(<span class="st">&quot;The person is an adult&quot;</span>, <span class="st">&quot;The person is a child&quot;</span>, <span class="st">&quot;unknown&quot;</span>)</span>
+<span id="cb4-14"><a href="#cb4-14"></a>    )</span>
+<span id="cb4-15"><a href="#cb4-15"></a>  )</span>
+<span id="cb4-16"><a href="#cb4-16"></a>)</span></code></pre></div>
+<p>Example-2:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>structure_excel_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">new_file_structure_excel</span>(</span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="dt">cols =</span> <span class="kw">list</span>(</span>
+<span id="cb5-3"><a href="#cb5-3"></a>    <span class="kw">list</span>(</span>
+<span id="cb5-4"><a href="#cb5-4"></a>      <span class="dt">name =</span> <span class="st">&quot;city&quot;</span>,</span>
+<span id="cb5-5"><a href="#cb5-5"></a>      <span class="dt">type =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb5-6"><a href="#cb5-6"></a>      <span class="kw">new_col_meta</span>(</span>
+<span id="cb5-7"><a href="#cb5-7"></a>        <span class="dt">desc =</span> <span class="st">&quot;National and international city codes&quot;</span>,</span>
+<span id="cb5-8"><a href="#cb5-8"></a>        <span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;XXXX&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="ot">NA</span>),</span>
+<span id="cb5-9"><a href="#cb5-9"></a>        <span class="dt">values_desc =</span> <span class="kw">c</span>(<span class="st">&quot;4 digit city code&quot;</span>, <span class="st">&quot;abroad&quot;</span>, <span class="st">&quot;missing&quot;</span>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a>      )</span>
+<span id="cb5-11"><a href="#cb5-11"></a>    ),</span>
+<span id="cb5-12"><a href="#cb5-12"></a>    <span class="kw">list</span>(</span>
+<span id="cb5-13"><a href="#cb5-13"></a>      <span class="dt">name =</span> <span class="st">&quot;adult&quot;</span>,</span>
+<span id="cb5-14"><a href="#cb5-14"></a>      <span class="dt">type =</span> <span class="st">&quot;logical&quot;</span>,</span>
+<span id="cb5-15"><a href="#cb5-15"></a>      <span class="kw">new_col_meta</span>(</span>
+<span id="cb5-16"><a href="#cb5-16"></a>        <span class="dt">desc =</span> <span class="st">&quot;Is the person an adult&quot;</span>,</span>
+<span id="cb5-17"><a href="#cb5-17"></a>        <span class="dt">values =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">NA</span>),</span>
+<span id="cb5-18"><a href="#cb5-18"></a>        <span class="dt">values_desc =</span> <span class="kw">c</span>(<span class="st">&quot;The person is an adult&quot;</span>, <span class="st">&quot;The person is a child&quot;</span>, <span class="st">&quot;unknown&quot;</span>)</span>
+<span id="cb5-19"><a href="#cb5-19"></a>      )</span>
+<span id="cb5-20"><a href="#cb5-20"></a>    )</span>
+<span id="cb5-21"><a href="#cb5-21"></a>  )</span>
+<span id="cb5-22"><a href="#cb5-22"></a>)</span></code></pre></div>
+<p>If a data file is read with the command <code>read_data()</code>, then all specified meta informations will be added to specific columns of the resulting <code>data.frame</code>.</p>
+<p>The meta data stored in a <code>file_structure</code> or a <code>file_definition</code> class object or a <code>data.frame</code> generated by calling <code>read_data()</code> can be extracted by calling <code>get_meta()</code>.</p>
+<p>Example-3:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>df_meta &lt;-<span class="st"> </span><span class="kw">get_meta</span>(file_definition_<span class="dv">1</span>, <span class="dt">cols =</span> <span class="kw">c</span>(<span class="st">&quot;city&quot;</span>, <span class="st">&quot;adult&quot;</span>))</span></code></pre></div>
+<p>Example-4:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>data &lt;-<span class="st"> </span><span class="kw">read_data</span>(file_definition_<span class="dv">1</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>df_meta &lt;-<span class="st"> </span><span class="kw">get_meta</span>(data, <span class="dt">cols =</span> <span class="kw">c</span>(<span class="st">&quot;city&quot;</span>, <span class="st">&quot;adult&quot;</span>))</span></code></pre></div>
+</div>
+<div id="important-commands" class="section level3">
+<h3>Important commands</h3>
+<p>The following section describes the most important function of <code>readall</code>. Each function is documented and the documentation of each function can be displayed by calling <code>?readall::FUNCTIONNAME</code>.</p>
+<div id="create-file_structure-class-objects" class="section level4">
+<h4>Create <code>file_structure</code> class objects</h4>
+<p><code>file_structure</code> class objects contain all information about the file structure, which can be valid for several data files (e.g. column structure, delimiter symbols, column names, data types etc.). This class objects can be created with the following commands:</p>
+<ul>
+<li><code>new_file_structure_fwf()</code>: File structure of FWF data files</li>
+<li><code>new_file_structure_dsv()</code>: File structure of DSV files</li>
+<li><code>new_file_structure_excel()</code>: File structure of EXCEL files</li>
+<li><code>new_file_structure_sas()</code>: File structure of SAS files</li>
+</ul>
+<p>Example:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>structure_fwf_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">new_file_structure_fwf</span>(</span>
+<span id="cb8-2"><a href="#cb8-2"></a>  <span class="dt">cols =</span> <span class="kw">list</span>(</span>
+<span id="cb8-3"><a href="#cb8-3"></a>    <span class="kw">list</span>(</span>
+<span id="cb8-4"><a href="#cb8-4"></a>      <span class="dt">type =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5"></a>      <span class="dt">name =</span> <span class="st">&quot;sex&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6"></a>      <span class="dt">start =</span> <span class="dv">1</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a>    ),</span>
+<span id="cb8-8"><a href="#cb8-8"></a>    <span class="kw">list</span>(</span>
+<span id="cb8-9"><a href="#cb8-9"></a>      <span class="dt">type =</span> <span class="st">&quot;numeric&quot;</span>,</span>
+<span id="cb8-10"><a href="#cb8-10"></a>      <span class="dt">name =</span> <span class="st">&quot;age&quot;</span>,</span>
+<span id="cb8-11"><a href="#cb8-11"></a>      <span class="dt">start =</span> <span class="dv">3</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a>    ),</span>
+<span id="cb8-13"><a href="#cb8-13"></a>    <span class="kw">list</span>(</span>
+<span id="cb8-14"><a href="#cb8-14"></a>      <span class="dt">typ =</span> <span class="st">&quot;numeric&quot;</span>,</span>
+<span id="cb8-15"><a href="#cb8-15"></a>      <span class="dt">name =</span> <span class="st">&quot;city&quot;</span>,</span>
+<span id="cb8-16"><a href="#cb8-16"></a>      <span class="dt">start =</span> <span class="dv">7</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a>      </span>
+<span id="cb8-18"><a href="#cb8-18"></a>    )</span>
+<span id="cb8-19"><a href="#cb8-19"></a>  ),</span>
+<span id="cb8-20"><a href="#cb8-20"></a>  <span class="dt">sep_width =</span> <span class="dv">1</span>,</span>
+<span id="cb8-21"><a href="#cb8-21"></a>  <span class="dt">adapters =</span> <span class="kw">new_adapters</span>(</span>
+<span id="cb8-22"><a href="#cb8-22"></a>    <span class="cf">function</span>(x) {</span>
+<span id="cb8-23"><a href="#cb8-23"></a>      x<span class="op">$</span>sex &lt;-<span class="st"> </span><span class="kw">ifelse</span>(x<span class="op">$</span>sex <span class="op">==</span><span class="st"> &quot;m&quot;</span>, <span class="st">&quot;male&quot;</span>, <span class="st">&quot;female&quot;</span>)</span>
+<span id="cb8-24"><a href="#cb8-24"></a>      x</span>
+<span id="cb8-25"><a href="#cb8-25"></a>    }</span>
+<span id="cb8-26"><a href="#cb8-26"></a>  )</span>
+<span id="cb8-27"><a href="#cb8-27"></a>)</span></code></pre></div>
+<p>The code above creates a <code>file_structure</code> class object for FWF data files. This data files contain three column (sex, age and city codes). The <code>sex</code> column starts with the first row character and contains a single character. After that, there is a blank space (<code>sep_width = 1</code>) and then cames the <code>age</code> column consisting out of three characters. After that is again a blank space and finally comes the <code>city</code> column holding the city codes. The created <code>file_structure</code> class object contains an adapter function, which will automatically be executed after reading a data file with this <code>file_structure</code> object. The adapter function recodes the <code>sex</code> column to full length strings.</p>
+</div>
+<div id="create-file_definition-class-objects" class="section level4">
+<h4>Create <code>file_definition</code> class objects</h4>
+<p>A <code>file_definition</code> class object contains all information can also be stored in <code>file_structure</code> class objects (information about the file structure which can be valid for all files of the same structure), but it also contains information that is only valid for a single specific data file. <code>file_definition</code> class objects can be created with the following command:</p>
+<ul>
+<li><code>new_file_definition()</code>: Takes an existing <code>file_structure</code> class objects and extends it to a <code>file_definition</code> class object. Depending on the <code>file_structure</code> class object the resulting <code>file_definition</code> class object can be describe FWF, DSV, EXCEL and SAS data files.</li>
+<li><code>new_file_definition_fwf()</code>: Creates a <code>file_definition</code> class object for FWF data files</li>
+<li><code>new_file_definition_dsv()</code>: Creates a <code>file_definition</code> class object for DSV data files</li>
+<li><code>new_file_definition_excel()</code>: Creates a <code>file_definition</code> class object for EXCEL data files</li>
+<li><code>new_file_definition_sas()</code>: Creates a <code>file_definition</code> class object for SAS data files</li>
+</ul>
+<p>Example:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>file_definition_file_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">new_file_definition</span>(</span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="dt">file_path =</span> <span class="st">&quot;C:/file1.dat&quot;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="dt">file_structure =</span> structure_fwf_<span class="dv">1</span>,</span>
+<span id="cb9-4"><a href="#cb9-4"></a>  <span class="dt">extra_adapters =</span> <span class="kw">new_adapters</span>(</span>
+<span id="cb9-5"><a href="#cb9-5"></a>    <span class="cf">function</span>(x) {</span>
+<span id="cb9-6"><a href="#cb9-6"></a>      x[x<span class="op">$</span>age <span class="op">&gt;=</span><span class="st"> </span><span class="dv">30</span> <span class="op">&amp;&amp;</span><span class="st"> </span>x<span class="op">$</span>age <span class="op">&lt;</span><span class="st"> </span><span class="dv">40</span>,]</span>
+<span id="cb9-7"><a href="#cb9-7"></a>    }</span>
+<span id="cb9-8"><a href="#cb9-8"></a>  )</span>
+<span id="cb9-9"><a href="#cb9-9"></a>)</span></code></pre></div>
+<p>The created <code>file_definition</code> class object <code>file_definition_file_1</code> extends the <code>file_structure</code> class object <code>structure_fwf_1</code>, which was defined earlier. Therefore, it is a <code>file_definition</code> for an FWF data file, which is located at <code>C:/file1.dat</code>. After reading this data file, the read data set is automatically filtered by age, such that only persons with age between 30 and 40 are kept.</p>
+</div>
+<div id="create-file_collection-class-objects" class="section level4">
+<h4>Create <code>file_collection</code> class objects</h4>
+<p>A <code>file_collection</code> class object contains a list of <code>file_definition</code> class objects, describing different data files, whose data should automatically be concatenated after reading the data files. A <code>file_collection</code> class object can be created with the command <code>new_file_collection()</code>.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>file_collection_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">new_file_collection</span>(</span>
+<span id="cb10-2"><a href="#cb10-2"></a>  file_definition_file_<span class="dv">1</span>,</span>
+<span id="cb10-3"><a href="#cb10-3"></a>  file_definition_file_<span class="dv">2</span>,</span>
+<span id="cb10-4"><a href="#cb10-4"></a>  file_definition_file_<span class="dv">3</span>,</span>
+<span id="cb10-5"><a href="#cb10-5"></a>  <span class="dt">cols_keep =</span> <span class="kw">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;age&quot;</span>),</span>
+<span id="cb10-6"><a href="#cb10-6"></a>  <span class="dt">extra_adapters =</span> <span class="kw">new_adapters</span>(</span>
+<span id="cb10-7"><a href="#cb10-7"></a>    <span class="cf">function</span>(x) {</span>
+<span id="cb10-8"><a href="#cb10-8"></a>      x[x<span class="op">$</span>sex <span class="op">==</span><span class="st"> &quot;male&quot;</span>,]</span>
+<span id="cb10-9"><a href="#cb10-9"></a>    }</span>
+<span id="cb10-10"><a href="#cb10-10"></a>  )</span>
+<span id="cb10-11"><a href="#cb10-11"></a>  <span class="dt">extra_col_file_path =</span> <span class="st">&quot;file&quot;</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a>)</span></code></pre></div>
+<p>The <code>file_collection</code> class object in this example contains the informations of 3 different data files. If <code>read_data()</code> is applied on <code>file_collection_1</code>, then the following steps are executed automatically:</p>
+<ol style="list-style-type: decimal">
+<li>All 3 data files are read and each data set is stored in a <code>data.frame</code></li>
+<li>For each <code>data.frame</code> only the columns <code>sex</code> and <code>age</code> are kept</li>
+<li>The column <code>file</code> is added to each <code>data.frame</code>, holding the file path of each data file</li>
+<li>The adapter functions are executed on each <code>data.frame</code>. For the data file defined in <code>file_definition_1</code>, three adapter functions were defined. First, the column <code>sex</code> is recoded, then the <code>data.frame</code> is filtered by <code>age</code> and finally only entries with <code>sex == &quot;male&quot;</code> are kept. For the data files defined in <code>file_definition_2</code> and <code>file_definition_3</code> we don’t know if there were adapter functions defined before (when the <code>file_definition</code> class objects were defined), but for both data files there is at least one adapter function defined, which filters <code>sex == &quot;male&quot;</code>.</li>
+<li>All three <code>data.frames</code> are concatenated into a single <code>data.frame</code></li>
+</ol>
+<p>The resulting <code>data.frame</code> could look something like this</p>
+<pre><code>#&gt;    sex age                 file
+#&gt; 1 male  16   R:/daten/file1.dat
+#&gt; 2 male  67   R:/daten/file1.dat
+#&gt; 3 male  31   R:/daten/file2.sas
+#&gt; 4 male  84   R:/daten/file2.sas
+#&gt; 5 male  47 R:/daten/file3.excel
+#&gt; 6 male  33 R:/daten/file3.excel
+#&gt; 7 male  98 R:/daten/file3.excel</code></pre>
+</div>
+<div id="reading-single-data-files" class="section level4">
+<h4>Reading single data files</h4>
+<p>The following functions can be used, in order to read data files:</p>
+<ul>
+<li><code>read_data()</code>: Read the FWF, DSV, EXCEL or SAS data file, which was defined in the passed in <code>file_definition</code> class object.</li>
+<li><code>read_data_fwf()</code>: Read an FWF data file. Instead of passing in a <code>file_definition</code> class object holding all needed informations, the needed file definitions are passed directy to the function.</li>
+<li><code>read_data_dsv()</code>: Read a DSV data file. Instead of passing in a <code>file_definition</code> class object holding all needed informations, the needed file definitions are passed directy to the function.</li>
+<li><code>read_data_excel()</code>: Read an EXCEL data file. Instead of passing in a <code>file_definition</code> class object holding all needed informations, the needed file definitions are passed directy to the function.</li>
+<li><code>read_data_sas()</code>: Read a SAS data file. Instead of passing in a <code>file_definition</code> class object holding all needed informations, the needed file definitions are passed directy to the function.</li>
+</ul>
+<p>Example-1:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>df1 &lt;-<span class="st"> </span><span class="kw">read_data</span>(file_definition_file_<span class="dv">1</span>)</span></code></pre></div>
+<p>Example-2:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>df2 &lt;-<span class="st"> </span><span class="kw">read_data_fwf</span>(</span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="dt">file_path =</span> <span class="st">&quot;R:/daten/file1.dat&quot;</span>,</span>
+<span id="cb13-3"><a href="#cb13-3"></a>  <span class="dt">cols =</span> <span class="kw">list</span>(</span>
+<span id="cb13-4"><a href="#cb13-4"></a>    <span class="kw">list</span>(</span>
+<span id="cb13-5"><a href="#cb13-5"></a>      <span class="dt">type =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb13-6"><a href="#cb13-6"></a>      <span class="dt">name =</span> <span class="st">&quot;sex&quot;</span>,</span>
+<span id="cb13-7"><a href="#cb13-7"></a>      <span class="dt">start =</span> <span class="dv">1</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a>    ),</span>
+<span id="cb13-9"><a href="#cb13-9"></a>    <span class="kw">list</span>(</span>
+<span id="cb13-10"><a href="#cb13-10"></a>      <span class="dt">type =</span> <span class="st">&quot;numeric&quot;</span>,</span>
+<span id="cb13-11"><a href="#cb13-11"></a>      <span class="dt">name =</span> <span class="st">&quot;age&quot;</span>,</span>
+<span id="cb13-12"><a href="#cb13-12"></a>      <span class="dt">start =</span> <span class="dv">3</span></span>
+<span id="cb13-13"><a href="#cb13-13"></a>    ),</span>
+<span id="cb13-14"><a href="#cb13-14"></a>    <span class="kw">list</span>(</span>
+<span id="cb13-15"><a href="#cb13-15"></a>      <span class="dt">typ =</span> <span class="st">&quot;numeric&quot;</span>,</span>
+<span id="cb13-16"><a href="#cb13-16"></a>      <span class="dt">name =</span> <span class="st">&quot;city&quot;</span>,</span>
+<span id="cb13-17"><a href="#cb13-17"></a>      <span class="dt">start =</span> <span class="dv">7</span></span>
+<span id="cb13-18"><a href="#cb13-18"></a>      </span>
+<span id="cb13-19"><a href="#cb13-19"></a>    )</span>
+<span id="cb13-20"><a href="#cb13-20"></a>  ),</span>
+<span id="cb13-21"><a href="#cb13-21"></a>  <span class="dt">sep_width =</span> <span class="dv">1</span>,</span>
+<span id="cb13-22"><a href="#cb13-22"></a>  <span class="dt">adapters =</span> <span class="kw">new_adapters</span>(</span>
+<span id="cb13-23"><a href="#cb13-23"></a>    <span class="cf">function</span>(x) {</span>
+<span id="cb13-24"><a href="#cb13-24"></a>      x<span class="op">$</span>sex &lt;-<span class="st"> </span><span class="kw">ifelse</span>(x<span class="op">$</span>sex <span class="op">==</span><span class="st"> &quot;m&quot;</span>, <span class="st">&quot;male&quot;</span>, <span class="st">&quot;female&quot;</span>)</span>
+<span id="cb13-25"><a href="#cb13-25"></a>      x</span>
+<span id="cb13-26"><a href="#cb13-26"></a>    },</span>
+<span id="cb13-27"><a href="#cb13-27"></a>    <span class="cf">function</span>(x) {</span>
+<span id="cb13-28"><a href="#cb13-28"></a>      x[x<span class="op">$</span>city <span class="op">&gt;=</span><span class="st"> </span><span class="dv">70000</span> <span class="op">&amp;&amp;</span><span class="st"> </span>x<span class="op">$</span>city <span class="op">&lt;</span><span class="st"> </span><span class="dv">80000</span>,]</span>
+<span id="cb13-29"><a href="#cb13-29"></a>    }</span>
+<span id="cb13-30"><a href="#cb13-30"></a>  ),</span>
+<span id="cb13-31"><a href="#cb13-31"></a>  <span class="dt">cols_keep =</span> <span class="kw">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;age&quot;</span>),</span>
+<span id="cb13-32"><a href="#cb13-32"></a>  <span class="dt">extra_col_file_path =</span> <span class="st">&quot;file&quot;</span></span>
+<span id="cb13-33"><a href="#cb13-33"></a>)</span></code></pre></div>
+</div>
+<div id="read-multiple-data-files-at-once" class="section level4">
+<h4>Read multiple data files at once</h4>
+<p>The function <code>read_data()</code> does not only take <code>file_definition</code> class objects, but also <code>file_collection</code> class objects. By using <code>file_collection</code> class objects, we can also read multiple data files at once.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>df_gesamt &lt;-<span class="st"> </span><span class="kw">read_data</span>(file_collection_<span class="dv">1</span>)</span></code></pre></div>
+<p>The command above reads all 3 data files defined in <code>file_collection_1</code>. The following steps are executed automatically:</p>
+<ol style="list-style-type: decimal">
+<li>All 3 data files are read and each data set is stored in a <code>data.frame</code></li>
+<li>For each <code>data.frame</code> only the columns <code>sex</code> and <code>age</code> are kept</li>
+<li>The column <code>file</code> is added to each <code>data.frame</code>, holding the file path of each data file</li>
+<li>The adapter functions are executed on each <code>data.frame</code>. For the data file defined in <code>file_definition_1</code>, three adapter functions were defined. First, the column <code>sex</code> is recoded, then the <code>data.frame</code> is filtered by <code>age</code> and finally only entries with <code>sex == &quot;male&quot;</code> are kept. For the data files defined in <code>file_definition_2</code> and <code>file_definition_3</code> we don’t know if there were adapter functions defined before (when the <code>file_definition</code> class objects were defined), but for both data files there is at least one adapter function defined, which filters <code>sex == &quot;male&quot;</code>.</li>
+<li>All three <code>data.frames</code> are concatenated into a single <code>data.frame</code></li>
+</ol>
+</div>
+<div id="read-meta-data" class="section level4">
+<h4>Read meta data</h4>
+<p>The function <code>get_meta()</code> can extract meta data from:</p>
+<ul>
+<li><code>file_structure</code> class objects</li>
+<li><code>file_definition</code> class objects</li>
+<li><code>file_collection</code> class objects</li>
+<li><code>data.frames</code> created by calling <code>read_data()</code> or <code>read_data_*()</code> (where <code>*</code> can stands for fwf/dsv/excel/sas)</li>
+</ul>
+<p>The command <code>get_meta()</code> returns a <code>data.frame</code> holding the following columns:</p>
+<ul>
+<li><code>col_name</code>: A charcter column, holding the names for each data column</li>
+<li><code>col_id</code>: A numeric column, holding the positions of each data column</li>
+<li><code>col_type</code>: A character column, holding data type of each data column</li>
+<li><code>col_desc</code>: A character column, describing each column in detail</li>
+<li><code>col_values</code>: A character column, holding a text version the value levels of each column</li>
+<li><code>col_values_desc</code>: A character column, describing each value level of each column</li>
+<li><code>col_valid_start</code>: A character column, giving some information since when the variable is valid</li>
+<li><code>col_valid_end</code>: A character column, giving some information till when the variable is valid</li>
+<li><code>file_path</code>: A character column, holding the file paths of the data files.</li>
+</ul>
+</div>
+<div id="change-existing-file_definition-or-file_collection-objects" class="section level4">
+<h4>Change existing <code>file_definition</code> or <code>file_collection</code> objects</h4>
+<p>Sometimes it is useful to modify some attributes of a <code>file_definition</code> or a <code>file_collection</code>. The following commands can be useful:</p>
+<ul>
+<li><code>set_cols_keep()</code>: Set the columns which should be kept when calling <code>read_data()</code></li>
+<li><code>set_extra_col_file_path()</code>: Set the name of the column, in which the file path of the data files should be stored.</li>
+<li><code>set_n_max()</code>: Set the maximum number of rows to be read when calling <code>read_data()</code>. If applied to a <code>file_collection</code> this value is set for each <code>file_definition</code> contained in the collection.</li>
+<li><code>set_adapters()</code>: Set the adapters attribute. This argument overwrites all existing adapter functions. If applied to a <code>file_collection</code>, this command is applied to each <code>file_definition</code> contained in the collection.</li>
+<li><code>add_adapters()</code>: Append a set of adapter functions to the already defined adapter functions. If applied to a <code>file_collection</code>, the adapter functions are appended to each <code>file_definition</code> contained in the collection.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

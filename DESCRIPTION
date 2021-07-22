@@ -1,0 +1,56 @@
+Package: readall
+Type: Package
+Title: Read FWF, DSV, EXCEL And SAS Files
+Version: 1.0.0
+Authors@R: c(person("Adrian", "Maldet", email = "maldet@posteo.at", role = c("aut", "cre")))
+Maintainers@R: c(person("Adrian", "Maldet", email = "maldet@posteo.at", role = c("aut", "cre")))
+Description: This package offers a single interface for reading
+    FWF, DSV, EXCEL and SAS data files. The `readall` package offers 
+    `file_structure` class, which allows you to describe the structure of your
+    data files (column names, column data types etc.). Once you have created
+    `file_structure` object, holding the information about a specific
+    file type, you can use this object
+    in order to read all data files, which
+    share the defined structure. Furthermore, you can add meta data to this object, 
+    describing the meaning of the columns and give detailed descriptions for each
+    value level. When reading the described
+    data file, the stored meta data will automatically be appended to
+    the specified columns of the generated data.frame.
+    The `readall` package offers a `file_collection`
+    class used to define a collection of files,
+    which will be automatically concatenated into a single data.frame 
+    when reading the collection.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    magrittr (>= 2.0.1),
+    utils (>= 4.0.3),
+    readr (>= 1.4.0),
+    readxl (>= 1.3.1),
+    rlang (>= 0.4.11),
+    haven (>= 2.4.1)
+Suggests: 
+    testthat (>= 3.0.0),
+    roxygen2 (>= 7.1.1),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+VignetteBuilder: knitr
+Collate: 
+    'enum.R'
+    'composerr.R'
+    'utils.R'
+    'utils_validation.R'
+    'meta.R'
+    'validate_file_structure.R'
+    'file_structure.R'
+    'validate_file_definition.R'
+    'file_definition.R'
+    'file_collection.R'
+    'adapters.R'
+    'cols.R'
+    'file_structure_methods.R'
+    'read_data.R'
