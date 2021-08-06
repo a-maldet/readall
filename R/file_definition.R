@@ -76,6 +76,8 @@ NULL
 #'   be added to the adapter functions already stored in the
 #'   [file_structure][new_file_structure_fwf()] class object. For further details
 #'   on adapter functions see section *adapters*.
+#' @param ... Additional arguments, which will be added to the resulting
+#'   `file_definition` class object.
 #' @return An `file_definition` class object holding all information needed for
 #'   reading the data file with [read_data()].
 #' @seealso [read_data()], [get_col_names()], [get_col_types()], [get_file_type()]
@@ -90,7 +92,8 @@ new_file_definition <- function(
   extra_col_name = NULL,
   extra_col_val = NULL,
   extra_col_file_path = FALSE,
-  extra_adapters = new_adapters()
+  extra_adapters = new_adapters(),
+  ...
 ) {
   new_file_definition_(
     file_path = file_path,
@@ -101,7 +104,8 @@ new_file_definition <- function(
     extra_col_val = extra_col_val,
     extra_col_file_path = extra_col_file_path,
     extra_adapters = extra_adapters,
-    err_h = composerr("Error while calling 'new_file_definition()'")
+    err_h = composerr("Error while calling 'new_file_definition()'"),
+    ...
   )
 }
 
@@ -118,7 +122,8 @@ new_file_definition_ <- function(
   extra_col_val = NULL,
   extra_col_file_path,
   extra_adapters = new_adapters(),
-  err_h = composerr("Error while calling 'new_file_definition_()'")
+  err_h = composerr("Error while calling 'new_file_definition_()'"),
+  ...
 ) {
   validate_file_structure(
     file_structure,
@@ -155,7 +160,8 @@ new_file_definition_ <- function(
         extra_col_name = extra_col_name,
         extra_col_val = extra_col_val,
         extra_col_file_path = extra_col_file_path,
-        err_h = err_h
+        err_h = err_h,
+        ...
       ),
       file_structure
     )

@@ -500,6 +500,9 @@ Sometimes it is useful to modify some attributes of a `file_definition` or a
 `file_collection`. The following commands can be useful:
 
 - `set_cols_keep()`: Set the columns which should be kept when calling `read_data()`
+- `set_cols_keep_intersection()`: Use the maximal possible set of columns
+  for a `file_collection`. This means, that the intersection of the
+  column names of each data file is used.
 - `set_extra_col_file_path()`: Set the name of the column, in which
   the file path of the data files should be stored.
 - `set_n_max()`: Set the maximum number of rows to be read when calling

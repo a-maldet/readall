@@ -215,6 +215,7 @@ validate_file_collection <- function(file_collection, validate_class = TRUE, err
 #' @param value A character vector holding the column names, which should
 #'   be kept.
 #' @return The modified object
+#' @seealso [set_cols_keep_intersection()]
 #' @export
 set_cols_keep <- function(obj, value) {
   set_cols_keep_(
@@ -291,6 +292,49 @@ set_cols_keep_.file_collection <- function(obj, value, err_h) {
   }
   validate_file_collection(obj, err_h = err_h)
   obj
+}
+
+#' Select the maximal set of columns in a [file_collection][new_file_collection()] class object
+#' 
+#' This function sets the `cols_keep` attribute in all
+#' [file_definition][new_file_definition()] class objects stored in
+#' a [file_collection][new_file_collection()] class object to the maximal
+#' set of columns. This set is the intersection of column names stored
+#' in the `col_names` attribute of each [file_definition][new_file_definition()]
+#' class object.
+#' @param obj A [file_collection][new_file_collection()]
+#'   class object, for which the `cols_keep` argument should be set.
+#' @return The modified [file_collection][new_file_collection()] class object.
+#' @seealso [set_cols_keep()]
+#' @export
+set_cols_keep_intersection <- function(obj) {
+  set_cols_keep_intersection_(
+    obj,
+    err_h = composerr("Error while calling 'set_cols_keep_intersection()'")
+  )
+}
+
+#' Helper function for [set_cols_keep_intersection()]
+#' 
+#' @inheritParams set_cols_keep_intersection
+#' @param err_h An error handler
+#' @rdname set_cols_keep_
+set_cols_keep_intersection_ <- function(obj, err_h) {
+  validate_file_collection(obj, err_h = err_h)
+  cols_intersection <- Reduce(
+    intersect,
+    lapply(
+      obj[sapply(obj, function(x) !is.null(x$col_names)) %>% unlist],
+      function(x) x$col_names
+    )
+  )
+  if (length(cols_intersection) == 0)
+    err_h("No mutual columns found: Empty intersection of column names.")
+  set_cols_keep_(
+    obj = obj,
+    value = cols_intersection,
+    err_h = err_h
+  )
 }
 
 #' Set the `extra_col_file_path` argument for a [file_definition][new_file_definition()] or a

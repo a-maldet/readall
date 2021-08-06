@@ -1,7 +1,7 @@
 Package: readall
 Type: Package
 Title: Read FWF, DSV, EXCEL And SAS Files
-Version: 1.0.0
+Version: 1.2.0
 Authors@R: c(person("Adrian", "Maldet", email = "maldet@posteo.at", role = c("aut", "cre")))
 Maintainers@R: c(person("Adrian", "Maldet", email = "maldet@posteo.at", role = c("aut", "cre")))
 Description: This package offers a single interface for reading
